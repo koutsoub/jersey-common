@@ -15,9 +15,9 @@
   </organization>
 
   <scm>
-    <developerConnection>scm:git:ssh://git@github.com/talis/talis-jersey-common.git</developerConnection>
-    <connection>scm:git:git://github.com/talis/talis-jersey-common.git</connection>
-    <url>http://github.com/talis/talis-jersey-common</url>
+    <developerConnection>scm:git:ssh://git@github.com/talis/jersey-common.git</developerConnection>
+    <connection>scm:git:git://github.com/talis/jersey-common.git</connection>
+    <url>http://github.com/talis/jersey-common</url>
   </scm>
   
   <properties>
