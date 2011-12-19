@@ -53,14 +53,9 @@ public class JerseyServletModule extends ServletModule{
 	}
 	
 	private String joinPackageNames(String...packageName){
-		StringBuilder builder = new StringBuilder("");
-		boolean first = true;
+		StringBuilder builder = new StringBuilder("com.talis.jersey");
 		for(String name : packageName){
-			if (first){
-				first = false;
-			}else{
-				builder.append(",");
-			}
+			builder.append(",");
 			builder.append(name);
 		}
 		return builder.toString();
