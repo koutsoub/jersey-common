@@ -4,7 +4,7 @@
   <groupId>com.talis</groupId>
   <artifactId>jersey-common</artifactId>
   <packaging>jar</packaging>
-  <version>1.3-SNAPSHOT</version>
+  <version>1.3</version>
   
   <url>https://github.com/talis/talis-jersey-common</url>
   <inceptionYear>2011</inceptionYear>
