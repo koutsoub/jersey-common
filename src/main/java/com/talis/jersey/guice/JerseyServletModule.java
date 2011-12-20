@@ -18,6 +18,10 @@ package com.talis.jersey.guice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
@@ -31,6 +35,17 @@ import com.talis.jersey.filters.ServerAgentHeaderFilter;
 public class JerseyServletModule extends ServletModule{
 
 	private final String[] propertyPackages;
+
+	static {
+		// Jersey uses java.util.logging, so here we bridge to slf4 
+		// This is a static initialiser because we don't want to do this multiple times.
+		java.util.logging.Logger rootLogger = LogManager.getLogManager().getLogger("");  
+		Handler[] handlers = rootLogger.getHandlers();  
+		for (int i = 0; i < handlers.length; i++) {  
+			rootLogger.removeHandler(handlers[i]);  
+		}  
+		SLF4JBridgeHandler.install();  
+	}
 	
 	public JerseyServletModule(String...propertyPackages){
 		this.propertyPackages = propertyPackages;
