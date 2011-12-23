@@ -32,11 +32,13 @@ import com.yammer.metrics.reporting.MetricsServlet;
 public class HttpServer {
 
 	private static final transient Logger LOG = LoggerFactory.getLogger(HttpServer.class);
+	
+	private Server server;
 
 	@SuppressWarnings("PMD.SignatureDeclareThrowsException")
 	public void start(int port, final Injector injector) throws Exception{
 		LOG.info("Starting http server on port {}", port);
-		Server server = new Server();
+		server = new Server();
         Connector connector = new SelectChannelConnector();
         connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
@@ -58,6 +60,27 @@ public class HttpServer {
 		} catch (Exception e) {
 			LOG.error("Error starting HTTP Server" , e);
 			throw new Exception("Unable to start HTTP Server", e);
+		}
+	}
+
+	public boolean isRunning() {
+		if (server != null) {
+			return server.isRunning();
+		} else {
+			return false;
+		}
+	}
+
+	@SuppressWarnings("PMD.SignatureDeclareThrowsException")
+	public void stop() throws Exception {
+		if (server != null) {
+			server.stop();
+		}
+	}
+
+	public void waitForShutdown() throws InterruptedException {
+		if (server != null) {
+			server.join();
 		}
 	}
 }
