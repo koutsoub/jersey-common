@@ -31,17 +31,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.talis.jersey.HttpServer;
-import com.talis.jersey.auth.Authenticator;
-import com.talis.jersey.auth.InvalidCredentialsException;
 import com.talis.jersey.filters.LoggingFilter;
 import com.talis.jersey.filters.ServerAgentHeaderFilter;
-import com.talis.jersey.filters.ServerInfo;
+import com.talis.jersey.guice.GenericServerInfoModule;
 import com.talis.jersey.guice.JerseyServletModule;
+import com.talis.jersey.guice.NoopAuthenticationModule;
 
 public class ServerAgentHeaderAndLoggingFilterAcceptanceTest {
 	
@@ -54,8 +52,11 @@ public class ServerAgentHeaderAndLoggingFilterAcceptanceTest {
 	
 	@Before
 	public void setUp() throws Exception {
+		System.setProperty(GenericServerInfoModule.SERVER_IDENTIFIER_PROPERTY, expectedServerAgent);
 		httpPort = findFreePort();
-		Module[] modules = {new JerseyServletModule("com.talis.jersey.apitest"), new StubModule()};
+		Module[] modules = {new JerseyServletModule("com.talis.jersey.apitest"), 
+							new NoopAuthenticationModule(),
+							new GenericServerInfoModule()};
 		injector = Guice.createInjector(modules);
 		embeddedServer = new HttpServer();
 		embeddedServer.start(httpPort, injector);
@@ -63,6 +64,7 @@ public class ServerAgentHeaderAndLoggingFilterAcceptanceTest {
 		
 	@After
 	public void tearDown() throws Exception {
+		System.clearProperty(GenericServerInfoModule.SERVER_IDENTIFIER_PROPERTY);
 	}
 	
 	@Test
@@ -111,30 +113,6 @@ public class ServerAgentHeaderAndLoggingFilterAcceptanceTest {
 	private void assertTalisResponseIdPresent(HttpResponse response) {
 		Header talisResponseId = response.getFirstHeader(LoggingFilter.X_TALIS_RESPONSE_ID);
 		assertNotNull(talisResponseId);
-	}
-		
-	class StubModule extends AbstractModule {
-
-		@Override
-		protected void configure() {
-			bind(Authenticator.class).toInstance(new Authenticator() {
-				
-				@Override
-				public void authenticate(String username, String password)
-						throws InvalidCredentialsException {
-					// do nothing;
-				}
-			});
-			
-			bind(ServerInfo.class).toInstance(new ServerInfo() {
-				
-				@Override
-				public String getServerIdentifier() {
-					return expectedServerAgent;
-				}
-			});
-		}
-		
 	}
 }
 

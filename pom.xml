@@ -23,7 +23,7 @@
   
   <properties>
     <jersey.version>1.11</jersey.version>
-    <metrics.version>2.0.0-BETA17</metrics.version>
+    <metrics.version>2.0.0-BETA18</metrics.version>
     <guice.version>3.0</guice.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jdk.version>1.6</jdk.version>
@@ -40,13 +40,6 @@
       <url>http://oss.talisplatform.com/content/repositories/talis-central-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  
-  <repositories>
-    <repository>
-      <id>repo.codahale.com</id>
-      <url>http://repo.codahale.com</url>
-    </repository>
-  </repositories>
   
   <dependencies>
     <!-- Jersey Modules -->

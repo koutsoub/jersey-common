@@ -35,15 +35,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.talis.jersey.HttpServer;
-import com.talis.jersey.auth.Authenticator;
-import com.talis.jersey.auth.InvalidCredentialsException;
-import com.talis.jersey.filters.ServerInfo;
+import com.talis.jersey.guice.GenericServerInfoModule;
 import com.talis.jersey.guice.JerseyServletModule;
+import com.talis.jersey.guice.NoopAuthenticationModule;
 
 public class DefaultExceptionMapperAcceptanceTest {
 	
@@ -55,7 +53,9 @@ public class DefaultExceptionMapperAcceptanceTest {
 	@Before
 	public void setUp() throws Exception {
 		httpPort = findFreePort();
-		Module[] modules = {new JerseyServletModule("com.talis.jersey.apitest"), new StubModule()};
+		Module[] modules = {new JerseyServletModule("com.talis.jersey.apitest"), 
+							new NoopAuthenticationModule(),
+							new GenericServerInfoModule()};
 		injector = Guice.createInjector(modules);
 		embeddedServer = new HttpServer();
 		embeddedServer.start(httpPort, injector);
@@ -141,29 +141,5 @@ public class DefaultExceptionMapperAcceptanceTest {
 		return String.format("http://localhost:%d/%s", port, path);
 	}
 
-	static class StubModule extends AbstractModule {
-
-		@Override
-		protected void configure() {
-			bind(Authenticator.class).toInstance(new Authenticator() {
-				
-				@Override
-				public void authenticate(String username, String password)
-						throws InvalidCredentialsException {
-					// do nothing;
-				}
-			});
-			
-			bind(ServerInfo.class).toInstance(new ServerInfo() {
-				
-				@Override
-				public String getServerIdentifier() {
-					return "";
-				}
-			});
-		}
-		
-	}
-	
 }
 

@@ -35,7 +35,9 @@ import com.talis.jersey.filters.ServerAgentHeaderFilter;
 public class JerseyServletModule extends ServletModule{
 
 	private final String[] propertyPackages;
-
+	public static final String DISABLE_DEFAULT_FILTERS_PROPERTY = "com.talis.jersey.guice.disable-default-filters";
+	
+	
 	static {
 		// Jersey uses java.util.logging, so here we bridge to slf4 
 		// This is a static initialiser because we don't want to do this multiple times.
@@ -68,9 +70,20 @@ public class JerseyServletModule extends ServletModule{
 	}
 	
 	private String joinPackageNames(String...packageName){
-		StringBuilder builder = new StringBuilder("com.talis.jersey");
+		StringBuilder builder = new StringBuilder();
+		
+		boolean first = true;
+		if (!Boolean.getBoolean(DISABLE_DEFAULT_FILTERS_PROPERTY)){
+			builder.append("com.talis.jersey");
+			first = false;
+		}
+		
 		for(String name : packageName){
-			builder.append(",");
+			if (first){
+				first = false;
+			}else{
+				builder.append(",");
+			}
 			builder.append(name);
 		}
 		return builder.toString();

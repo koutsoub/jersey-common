@@ -16,7 +16,7 @@
 
 package com.talis.jersey.filters;
 
-import java.util.UUID;
+import java.util.Random;
 
 import org.apache.log4j.MDC;
 import org.slf4j.Logger;
@@ -34,10 +34,11 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	public static final String X_TALIS_RESPONSE_ID = "X-TALIS-RESPONSE-ID";
 	public static final String REQUEST_UID = "R_UID";
 	static final String REQUEST_START_TIME = "R_START_TIME";
+	private final Random r = new Random();
 	
 	@Override
 	public ContainerRequest filter(ContainerRequest request) {
-    	MDC.put(REQUEST_UID, getRUID());
+    	MDC.put(REQUEST_UID, getRUID(8));
     	MDC.put(REQUEST_START_TIME, new Long(System.currentTimeMillis()));
     	if (LOG.isInfoEnabled()) {
     		LOG.info(String.format("Starting request %s",request.getPath()));
@@ -61,29 +62,21 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 		return response;
     }
 	
-
-    private static final int kFNVOffset = (int) 2166136261l;
-	private static final int kFNVPrime = 16777619;
-    public static String getRUID(){
-		String str = UUID.randomUUID().toString();
-	    int hash = kFNVOffset;
-	    for (int i = 0; i < str.length(); i++) {
-	      hash ^= (0x0000ffff & (int)str.charAt(i));
-	      hash *= kFNVPrime;
+	private String getRUID(int len){
+	    StringBuffer uid = new StringBuffer();
+	    for (int i=0;i<len;i++) {
+			int rand = r.nextInt(10000);
+			int mod36 = rand % 36;
+	    	encodeAndAdd(uid, mod36);
 	    }
-
-	    long hashValue = (long)Integer.MAX_VALUE + (long)hash;
-
-	    // Now encode the hash in base 36, i.e. [a-z0-9]
-	    StringBuffer ret = new StringBuffer();
-	    while (hashValue > 0){
-	      if (( hashValue % 36) < 10) { 
-	    	  ret.append((char)(((int)'0') + (int)(hashValue % 36)));
-	      } else { 
-	    	  ret.append((char)(((int)'a') + (int)((hashValue % 36) - 10)));
-	      }	      
-	      hashValue  /= 36;
-	    }
-	    return ret.toString();
+	    return uid.toString();
     }
+
+	private void encodeAndAdd(StringBuffer ret, long mod36Val) {
+		if (mod36Val < 10) { 
+			ret.append((char)(((int)'0') + (int)mod36Val));
+		} else { 
+			ret.append((char)(((int)'a') + (int)(mod36Val - 10)));
+		}
+	}
 }
